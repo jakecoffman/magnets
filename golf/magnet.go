@@ -1,4 +1,4 @@
-package magnets
+package golf
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"

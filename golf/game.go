@@ -1,4 +1,4 @@
-package magnets
+package golf
 
 import (
 	"encoding/json"
@@ -8,8 +8,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/jakecoffman/cp"
 	"github.com/jakecoffman/cpebiten"
-	"github.com/jakecoffman/magnets/magnets/constant"
-	"github.com/jakecoffman/magnets/magnets/hole"
+	"github.com/jakecoffman/magnets/golf/constant"
+	"github.com/jakecoffman/magnets/golf/hole"
 	"image/color"
 	"math/rand"
 	"os"

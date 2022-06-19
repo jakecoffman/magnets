@@ -1,9 +1,9 @@
-package magnets
+package golf
 
 import (
 	"github.com/jakecoffman/cp"
 	"github.com/jakecoffman/cpebiten"
-	"github.com/jakecoffman/magnets/magnets/constant"
+	"github.com/jakecoffman/magnets/golf/constant"
 )
 
 type Ball struct {
@@ -28,7 +28,7 @@ func NewBall(game *Game, position cp.Vector) *Ball {
 		if body.Velocity().LengthSq() < 1 {
 			body.SetVelocity(0, 0)
 		}
-		// get pulled towards magnets
+		// get pulled towards golf
 		for _, magnet := range game.magnets {
 			dir := VectorFrom(body.Position(), magnet.shape.Body().Position()).Normalize()
 			//dist := body.Position().DistanceSq(magnet.shape.Body().Position())
