@@ -10,6 +10,8 @@ import (
 
 type Level struct {
 	space *cp.Space
+
+	cars []*Car
 }
 
 func NewLevel(space *cp.Space) *Level {
@@ -27,21 +29,24 @@ func NewLevel(space *cp.Space) *Level {
 
 	addWall(space, V(100, constant.ScreenHeight), V(100, constant.ScreenHeight-200))
 
-	addJunk(space)
-	addJunk(space)
+	level := &Level{
+		space: space,
+	}
+
+	for i := 0; i < 10; i++ {
+		level.addJunk(space)
+	}
 
 	go func() {
 		for {
 			time.Sleep(1 * time.Second)
 			space.AddPostStepCallback(func(space *cp.Space, key interface{}, data interface{}) {
-				addJunk(space)
+				level.addJunk(space)
 			}, nil, nil)
 		}
 	}()
 
-	return &Level{
-		space: space,
-	}
+	return level
 }
 
 func (l *Level) Update() {
@@ -49,7 +54,9 @@ func (l *Level) Update() {
 }
 
 func (l *Level) Draw(screen *ebiten.Image) {
-
+	for _, car := range l.cars {
+		car.Draw(screen)
+	}
 }
 
 func addWall(space *cp.Space, a, b cp.Vector) {
@@ -66,11 +73,21 @@ func addWallPoly(space *cp.Space, a, b, c, d cp.Vector) {
 	wall.SetFilter(NotGrabbable)
 }
 
-func addJunk(space *cp.Space) {
-	addBigBox(space)
+func (l *Level) addJunk(space *cp.Space) {
+	if rand.Intn(2)%2 == 0 {
+		addBigBox(space)
+	} else {
+		body, shape := AddMarchedJunk(space, "car.png")
+		car := &Car{
+			body:  body,
+			shape: shape,
+			img:   Extract("car.png"),
+		}
+		l.cars = append(l.cars, car)
+	}
 }
 
-func addBigBox(space *cp.Space) {
+func addBigBox(space *cp.Space) (*cp.Body, *cp.Shape) {
 	const (
 		boxMass = 5
 		boxSize = 50
@@ -81,4 +98,5 @@ func addBigBox(space *cp.Space) {
 	boxShape := space.AddShape(cp.NewBox(boxBody, boxSize, boxSize, 0))
 	boxShape.SetFriction(0.7)
 	boxShape.SetCollisionType(collisionCrate)
+	return boxBody, boxShape
 }
