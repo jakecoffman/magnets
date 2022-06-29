@@ -15,3 +15,6 @@ git commit -m 'deploy'
 git push -f git@github.com:jakecoffman/magnets.git main:gh-pages
 
 cd -
+
+# Create the zip file for the distribution to itch.io
+zip dist.zip dist/*
