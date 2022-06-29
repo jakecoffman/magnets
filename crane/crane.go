@@ -20,7 +20,8 @@ type Crane struct {
 	winchServo *cp.SlideJoint
 
 	// Temporary joint used to hold the hook to the load.
-	hookJoint *cp.Constraint
+	hookJoints      []*cp.Constraint
+	constrainedWith []*cp.Body
 
 	magnetImg *ebiten.Image
 	hookBody  *cp.Body
@@ -80,9 +81,12 @@ func (c *Crane) Update() {
 	// Set the max length of the winch servo to match the mouse's height.
 	c.winchServo.Max = math.Max(mouse.Y-100, 50)
 
-	if c.hookJoint != nil && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
-		c.space.RemoveConstraint(c.hookJoint)
-		c.hookJoint = nil
+	if len(c.hookJoints) > 0 && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		for j := range c.hookJoints {
+			c.space.RemoveConstraint(c.hookJoints[j])
+		}
+		c.hookJoints = c.hookJoints[0:0]
+		c.constrainedWith = c.constrainedWith[0:0]
 	}
 }
 

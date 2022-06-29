@@ -15,5 +15,5 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.crane.Draw(screen)
 	g.level.Draw(screen)
 
-	ebitenutil.DebugPrint(screen, "Control the crane by moving the mouse. Right click to release.")
+	ebitenutil.DebugPrint(screen, "Control the crane by moving the mouse. Left click to release.")
 }
