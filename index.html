@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<head>
+    <meta name="twitter:card" content="player" />
+    <meta name="twitter:site" content="@nill" />
+    <meta name="twitter:creator" content="@nill" />
+    <meta property="og:url" content="https://jakecoffman.com/magnets/" />
+    <meta property="og:title" content="Magnets" />
+    <meta property="og:description" content="Magnets: the game" />
+    <!-- TODO: preview image -->
+    <meta property="og:image" content="https://jakecoffman.com/magnets/preview.png" />
+    <meta name="twitter:player" content="https://jakecoffman.com/magnets/" />
+    <meta name="twitter:player:width" content="800" />
+    <meta name="twitter:player:height" content="600" />
+</head>
+<body>
+<script src="wasm_exec.js"></script>
+<script>
+  if (!WebAssembly.instantiateStreaming) { // polyfill
+    WebAssembly.instantiateStreaming = async (resp, importObject) => {
+      const source = await (await resp).arrayBuffer();
+      return await WebAssembly.instantiate(source, importObject);
+    };
+  }
+
+  const go = new Go();
+  let mod, inst;
+  WebAssembly.instantiateStreaming(fetch("magnets.wasm"), go.importObject).then((result) => {
+    mod = result.module;
+    inst = result.instance;
+    run()
+  }).catch((err) => {
+    console.error(err);
+  });
+
+  async function run() {
+    console.clear();
+    await go.run(inst);
+    inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
+  }
+</script>
