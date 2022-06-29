@@ -5,7 +5,7 @@ set -e
 
 rm -rf dist
 mkdir -p dist
-GOOS=js GOARCH=wasm go build -o dist/magnets.wasm cmd/magnets/magnets.go
+GOOS=js GOARCH=wasm go build -o dist/magnets.wasm cmd/crane/crane.go
 cp wasm_exec.js index.html dist
 
 cd dist
