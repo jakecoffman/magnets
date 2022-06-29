@@ -4,12 +4,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/jakecoffman/cp"
 	"github.com/jakecoffman/magnets/crane/constant"
+	"math/rand"
+	"time"
 )
 
 type Level struct {
 	space *cp.Space
-
-	junk []*cp.Shape
 }
 
 func NewLevel(space *cp.Space) *Level {
@@ -22,22 +22,25 @@ func NewLevel(space *cp.Space) *Level {
 
 	addWallPoly(space, tl, tr, V(w, -1000), V(0, -1000))
 	addWallPoly(space, tr, br, V(w+1000, 0), V(w+1000, h))
-	addWallPoly(space, br, bl, V(0, 10000), V(w, 10000))
+	addWallPoly(space, br, bl.Add(V(100, 0)), V(0, 10000), V(w, 10000))
 	addWallPoly(space, bl, tl, V(-1000, 0), V(-1000, h))
 
-	const (
-		boxMass = 10
-		boxSize = 50
-	)
-	boxBody := space.AddBody(cp.NewBody(boxMass, cp.MomentForBox(boxMass, boxSize, 0)))
-	boxBody.SetPosition(V(constant.ScreenWidth/2, constant.ScreenHeight/2))
-	boxShape := space.AddShape(cp.NewBox(boxBody, boxSize, boxSize, 0))
-	boxShape.SetFriction(0.7)
-	boxShape.SetCollisionType(collisionCrate)
+	addWall(space, V(100, constant.ScreenHeight), V(100, constant.ScreenHeight-200))
+
+	addJunk(space)
+	addJunk(space)
+
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			space.AddPostStepCallback(func(space *cp.Space, key interface{}, data interface{}) {
+				addJunk(space)
+			}, nil, nil)
+		}
+	}()
 
 	return &Level{
 		space: space,
-		junk:  []*cp.Shape{boxShape},
 	}
 }
 
@@ -50,7 +53,7 @@ func (l *Level) Draw(screen *ebiten.Image) {
 }
 
 func addWall(space *cp.Space, a, b cp.Vector) {
-	wall := space.AddShape(cp.NewSegment(space.StaticBody, a, b, 1))
+	wall := space.AddShape(cp.NewSegment(space.StaticBody, a, b, 5))
 	wall.SetElasticity(1)
 	wall.SetFriction(1)
 	wall.SetFilter(NotGrabbable)
@@ -61,4 +64,21 @@ func addWallPoly(space *cp.Space, a, b, c, d cp.Vector) {
 	wall.SetElasticity(1)
 	wall.SetFriction(1)
 	wall.SetFilter(NotGrabbable)
+}
+
+func addJunk(space *cp.Space) {
+	addBigBox(space)
+}
+
+func addBigBox(space *cp.Space) {
+	const (
+		boxMass = 5
+		boxSize = 50
+	)
+	boxBody := space.AddBody(cp.NewBody(boxMass, cp.MomentForBox(boxMass, boxSize, 0)))
+	x := rand.Intn(constant.ScreenWidth-100) + 100
+	boxBody.SetPosition(V(x, constant.ScreenHeight/2))
+	boxShape := space.AddShape(cp.NewBox(boxBody, boxSize, boxSize, 0))
+	boxShape.SetFriction(0.7)
+	boxShape.SetCollisionType(collisionCrate)
 }

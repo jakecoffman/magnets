@@ -21,6 +21,9 @@ type Crane struct {
 
 	// Temporary joint used to hold the hook to the load.
 	hookJoint *cp.Constraint
+
+	magnetImg *ebiten.Image
+	hookBody  *cp.Body
 }
 
 func NewCrane(space *cp.Space) *Crane {
@@ -40,16 +43,20 @@ func NewCrane(space *cp.Space) *Crane {
 	// You can also change the error bias to control how it slows down.
 	//dollyServo.SetErrorBias(0.2)
 
-	hookBody := space.AddBody(cp.NewBody(1, cp.INFINITY))
+	const (
+		hookMass   = 1
+		hookRadius = 10
+	)
+	hookBody := space.AddBody(cp.NewBody(hookMass, cp.MomentForCircle(hookMass, hookRadius, 0, Z())))
 	hookBody.SetPosition(cp.Vector{200, 200})
 
 	// This will be used to figure out when the hook touches a box.
-	sensor := space.AddShape(cp.NewCircle(hookBody, 10, Z()))
+	sensor := space.AddShape(cp.NewCircle(hookBody, hookRadius, Z()))
 	//sensor.SetSensor(true)
 	sensor.SetCollisionType(collisionHook)
 
 	// By updating the max length of the joint you can make it pull up the load.
-	winchServo := space.AddConstraint(cp.NewSlideJoint(dollyBody, hookBody, Z(), Z(), 0, cp.INFINITY)).Class.(*cp.SlideJoint)
+	winchServo := space.AddConstraint(cp.NewSlideJoint(dollyBody, hookBody, Z(), V(0, -10), 0, cp.INFINITY)).Class.(*cp.SlideJoint)
 	winchServo.SetMaxForce(300_000)
 	winchServo.SetMaxBias(600)
 
@@ -58,6 +65,8 @@ func NewCrane(space *cp.Space) *Crane {
 		dollyBody:  dollyBody,
 		dollyServo: dollyServo,
 		winchServo: winchServo,
+		hookBody:   hookBody,
+		magnetImg:  Extract("magnet.png"),
 	}
 }
 
@@ -78,5 +87,11 @@ func (c *Crane) Update() {
 }
 
 func (c *Crane) Draw(screen *ebiten.Image) {
-
+	opt := &ebiten.DrawImageOptions{}
+	w, h := c.magnetImg.Size()
+	opt.GeoM.Translate(float64(-w/2), float64(-h/2))
+	opt.GeoM.Scale(.4, .4)
+	opt.GeoM.Rotate(c.hookBody.Angle())
+	opt.GeoM.Translate(c.hookBody.Position().X, c.hookBody.Position().Y)
+	screen.DrawImage(c.magnetImg, opt)
 }
