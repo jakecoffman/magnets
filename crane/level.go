@@ -68,8 +68,8 @@ func addWall(space *cp.Space, a, b cp.Vector) {
 
 func addWallPoly(space *cp.Space, a, b, c, d cp.Vector) {
 	wall := space.AddShape(cp.NewPolyShape(space.StaticBody, 4, []cp.Vector{a, b, c, d}, cp.NewTransformIdentity(), 1))
-	wall.SetElasticity(1)
-	wall.SetFriction(1)
+	wall.SetElasticity(0)
+	wall.SetFriction(10)
 	wall.SetFilter(NotGrabbable)
 }
 
@@ -96,7 +96,7 @@ func addBigBox(space *cp.Space) (*cp.Body, *cp.Shape) {
 	x := rand.Intn(constant.ScreenWidth-100) + 100
 	boxBody.SetPosition(V(x, constant.ScreenHeight/2))
 	boxShape := space.AddShape(cp.NewBox(boxBody, boxSize, boxSize, 0))
-	boxShape.SetFriction(0.7)
+	boxShape.SetFriction(1)
 	boxShape.SetCollisionType(collisionCrate)
 	return boxBody, boxShape
 }

@@ -15,7 +15,7 @@ func NewGame() *Game {
 	space := cp.NewSpace()
 	space.Iterations = 30
 	space.SetGravity(cp.Vector{0, 1000})
-	space.SetDamping(0.8)
+	space.SetDamping(0.4)
 
 	level := NewLevel(space)
 	crane := NewCrane(space)

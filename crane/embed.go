@@ -66,7 +66,8 @@ func AddMarchedJunk(space *cp.Space, imageName string) (*cp.Body, *cp.Shape) {
 	body.SetPosition(V(x, constant.ScreenHeight/2))
 	//body.SetPosition(V(rand.Intn(640)-320, rand.Intn(480)-240))
 	shape := space.AddShape(cp.NewPolyShape(body, len(line.Verts), line.Verts, cp.NewTransformIdentity(), 0))
-	shape.SetElasticity(.5)
+	shape.SetElasticity(0)
+	shape.SetFriction(1)
 	shape.SetCollisionType(collisionCrate)
 	return body, shape
 	// or use the outline of the shape with lines if you don't want a polygon
